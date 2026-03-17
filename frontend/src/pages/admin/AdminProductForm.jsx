@@ -21,6 +21,7 @@ const AdminProductForm = () => {
     });
     const [sizes, setSizes] = useState([{ label: 'Small', price: 0, stock: 0 }]); 
     const [files, setFiles] = useState([]); 
+    const [existingImages, setExistingImages] = useState([]);
 
     useEffect(() => {
         if (isEditMode) {
@@ -36,8 +37,8 @@ const AdminProductForm = () => {
                         category: p.category,
                         customizationType: p.customizationType,
                         isTrending: p.isTrending || false,
-                        images: p.images
                     });
+                    setExistingImages(p.images || []);
                     if (p.sizes && p.sizes.length > 0) setSizes(p.sizes);
                 } catch (error) {
                     console.error("Failed to fetch", error);
@@ -71,6 +72,10 @@ const AdminProductForm = () => {
         setFiles(Array.from(e.target.files));
     };
 
+    const handleRemoveExistingImage = (public_id) => {
+        setExistingImages(existingImages.filter(img => img.public_id !== public_id));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -83,6 +88,9 @@ const AdminProductForm = () => {
         data.append('customizationType', formData.customizationType);
         data.append('isTrending', formData.isTrending);
         data.append('sizes', JSON.stringify(sizes));
+        
+        // Append existing images that the user wants to KEEP
+        data.append('existingImages', JSON.stringify(existingImages));
 
         
         files.forEach(file => {
@@ -211,12 +219,30 @@ const AdminProductForm = () => {
                     <label style={{ display: 'block', marginBottom: '0.5rem' }}>Product Images</label>
                     <input type="file" multiple onChange={handleFileChange} accept="image/*" />
 
-                    {}
-                    {isEditMode && formData.images && (
-                        <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                            {formData.images.map(img => (
-                                <img key={img.public_id} src={img.url} alt="" referrerPolicy="no-referrer" style={{ width: '60px', height: '60px', objectFit: 'cover' }} />
-                            ))}
+                    {/* Show existing images */}
+                    {isEditMode && existingImages.length > 0 && (
+                        <div style={{ marginTop: '1rem' }}>
+                            <p style={{ fontSize: '0.9rem', color: '#666', marginBottom: '0.5rem' }}>Current Images:</p>
+                            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+                                {existingImages.map(img => (
+                                    <div key={img.public_id} style={{ position: 'relative' }}>
+                                        <img src={img.url} alt="" referrerPolicy="no-referrer" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #ddd' }} />
+                                        <button 
+                                            type="button" 
+                                            onClick={() => handleRemoveExistingImage(img.public_id)}
+                                            style={{
+                                                position: 'absolute', top: '-5px', right: '-5px',
+                                                background: 'red', color: 'white', border: 'none', 
+                                                borderRadius: '50%', width: '20px', height: '20px', 
+                                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                                cursor: 'pointer', fontSize: '12px'
+                                            }}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
                         </div>
                     )}
                 </div>

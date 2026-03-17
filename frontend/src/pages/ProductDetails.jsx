@@ -142,35 +142,62 @@ const ProductDetails = () => {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 'clamp(2rem, 5vw, 4rem)', marginBottom: '1.5rem' }}>
                     {}
                         {}
-                        <div style={{ position: 'relative', marginBottom: '1rem' }}>
-                            <div style={{
-                                display: 'flex',
-                                overflowX: 'auto',
-                                scrollSnapType: 'x mandatory',
-                                WebkitOverflowScrolling: 'touch',
-                                scrollbarWidth: 'none', 
-                                msOverflowStyle: 'none',  
-                            }} className="hide-scrollbar">
+                        <div style={{ position: 'relative', marginBottom: '1rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                            {/* Main Image */}
+                            <div style={{ width: '100%', aspectRatio: '1/1', backgroundColor: 'var(--color-surface)', borderRadius: '8px', overflow: 'hidden' }}>
                                 {product.images.length > 0 ? (
-                                    product.images.map((img, idx) => (
-                                        <div key={idx} style={{ flexShrink: 0, width: '100%', scrollSnapAlign: 'start', aspectRatio: '1/1', backgroundColor: 'var(--color-surface)' }}>
+                                    <img
+                                        src={product.images[currentImageIndex].url}
+                                        alt={`${product.name} main`}
+                                        referrerPolicy="no-referrer"
+                                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                                    />
+                                ) : (
+                                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>No Image</div>
+                                )}
+                            </div>
+                            
+                            {/* Thumbnail Gallery */}
+                            {product.images.length > 1 && (
+                                <div style={{
+                                    display: 'flex',
+                                    gap: '0.5rem',
+                                    overflowX: 'auto',
+                                    scrollbarWidth: 'none', 
+                                    msOverflowStyle: 'none',
+                                    paddingBottom: '0.5rem'
+                                }} className="hide-scrollbar">
+                                    {product.images.map((img, idx) => (
+                                        <div 
+                                            key={idx} 
+                                            onClick={() => setCurrentImageIndex(idx)}
+                                            style={{ 
+                                                flexShrink: 0, 
+                                                width: '80px', 
+                                                height: '80px', 
+                                                borderRadius: '6px', 
+                                                overflow: 'hidden',
+                                                cursor: 'pointer',
+                                                border: currentImageIndex === idx ? '2px solid #111' : '2px solid transparent',
+                                                opacity: currentImageIndex === idx ? 1 : 0.6,
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                        >
                                             <img
                                                 src={img.url}
-                                                alt={`${product.name} ${idx + 1}`}
+                                                alt={`${product.name} thumbnail ${idx + 1}`}
                                                 referrerPolicy="no-referrer"
                                                 style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                                             />
                                         </div>
-                                    ))
-                                ) : (
-                                    <div style={{ width: '100%', aspectRatio: '1/1', backgroundColor: 'var(--color-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>No Image</div>
-                                )}
-                            </div>
+                                    ))}
+                                </div>
+                            )}
                         </div>
 
                     {}
                     <div>
-                        <h1 style={{ fontSize: 'clamp(2rem, 5vw, 2.8rem)', marginBottom: '0.5rem', fontFamily: 'serif', color: '#0f172a', fontWeight: 500 }}>{product.name}</h1>
+                        <h1 style={{ fontSize: 'clamp(1.8rem, 4vw, 2.4rem)', marginBottom: '0.2rem', fontFamily: 'serif', color: '#0f172a', fontWeight: 500, lineHeight: 1.1 }}>{product.name}</h1>
 
                         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
                             <div style={{ display: 'flex' }}>

@@ -13,27 +13,24 @@ const Home = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     
     
-    const [category, setCategory] = useState(() => {
-        const urlCategory = searchParams.get('category');
-        return urlCategory || '';
-    });
+    const [category, setCategory] = useState('featured');
     
     const [availableCategories, setAvailableCategories] = useState([]);
     const { addToCart } = useCart();
     const { addToWishlist: addProductToWishlist } = useWishlist();
     const { isAdmin } = useAuth();
     const navigate = useNavigate();
-    // We still want to sync if URL changes externally (e.g. forward/back buttons)
+    // Sync URL category changes
     useEffect(() => {
         const urlCategory = searchParams.get('category');
-        if (urlCategory !== category) {
-             setCategory(urlCategory || '');
+        if (urlCategory && urlCategory !== category) {
+             setCategory(urlCategory);
         }
     }, [searchParams]);
 
     const handleCategoryClick = (c) => {
         setCategory(c);
-        if (c === '') {
+        if (c === 'featured') {
             searchParams.delete('category');
         } else {
             searchParams.set('category', c);
@@ -94,7 +91,9 @@ const Home = () => {
             try {
 
                 let query = '/products?limit=8';
-                if (category) {
+                if (category === 'featured') {
+                    query = '/products?trending=true&limit=8';
+                } else if (category) {
                     query += `&category=${category}`;
                 }
 
@@ -241,17 +240,17 @@ const Home = () => {
                 <div className="category-bubbles" style={{ margin: '-1rem -1.5rem 2rem', padding: '1rem 1.5rem', overflowX: 'auto', WebkitOverflowScrolling: 'touch', textAlign: 'center' }}>
                     <div style={{ display: 'inline-flex', gap: '2.5rem', margin: '0 auto', padding: '0 1rem' }}>
                         <div
-                            onClick={() => handleCategoryClick('')}
+                            onClick={() => handleCategoryClick('featured')}
                             style={{
                                 display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', cursor: 'pointer',
-                                opacity: category === '' ? 1 : 0.6,
-                                transform: category === '' ? 'scale(1.05)' : 'scale(1)',
+                                opacity: category === 'featured' ? 1 : 0.6,
+                                transform: category === 'featured' ? 'scale(1.05)' : 'scale(1)',
                                 transition: 'all 0.3s'
                             }}>
                             <div style={{ width: '70px', height: '70px', borderRadius: '50%', backgroundColor: 'var(--color-surface)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: category === '' ? '0 0 0 2px var(--color-primary)' : '0 2px 10px rgba(0,0,0,0.05)' }}>
                                 <Sparkles size={24} color="var(--color-primary)" />
                             </div>
-                            <span style={{ fontSize: '0.85rem', fontWeight: category === '' ? 600 : 400 }}>Featured</span>
+                            <span style={{ fontSize: '0.85rem', fontWeight: category === 'featured' ? 600 : 400 }}>Trending</span>
                         </div>
                         {availableCategories.map(c => (
                             <div
