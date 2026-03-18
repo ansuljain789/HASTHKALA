@@ -43,7 +43,7 @@ const Profile = () => {
     const fetchMyOrders = async () => {
         try {
             setLoadingOrders(true);
-            const { data } = await api.get('/orders/me/all');
+            const { data } = await api.get('/orders/me');
             setOrders(data.orders || []);
         } catch (error) {
             console.error("Failed to fetch orders", error);

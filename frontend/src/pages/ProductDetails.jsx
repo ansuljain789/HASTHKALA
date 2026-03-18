@@ -321,7 +321,7 @@ const ProductDetails = () => {
                                 {reviews.map((review) => (
                                     <div key={review._id} style={{ padding: '0.8rem 1rem', backgroundColor: '#f9fafb', borderRadius: '8px', border: '1px solid #f3f4f6' }}>
                                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.4rem' }}>
-                                            <strong style={{ fontSize: '1rem', color: '#1f2937' }}>{review.user?.name || 'Anonymous User'}</strong>
+                                            <strong style={{ fontSize: '1rem', color: '#1f2937' }}>{review.user?.name || review.reviewerName || 'Anonymous User'}</strong>
                                             <div style={{ display: 'flex' }}>
                                                 {[1, 2, 3, 4, 5].map((star) => (
                                                     <Star key={star} size={13} fill={star <= review.rating ? "#facc15" : "none"} color={star <= review.rating ? "#facc15" : "#e5e7eb"} style={{ marginLeft: '2px' }} />

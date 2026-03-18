@@ -38,6 +38,25 @@ const AdminOrders = () => {
         setExpandedOrderId(expandedOrderId === orderId ? null : orderId);
     };
 
+    const handleDownload = async (imgUrl, filename) => {
+        try {
+            const response = await fetch(imgUrl);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = filename || 'customization-image.jpg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            window.URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Download failed', error);
+            alert('Failed to download image directly. It might open in a new tab instead.');
+            window.open(imgUrl, '_blank');
+        }
+    };
+
     if (loading) return <div>Loading orders...</div>;
 
     return (
@@ -123,32 +142,38 @@ const AdminOrders = () => {
                                                                     {item.customization.text && <p>Text: "<em>{item.customization.text}</em>"</p>}
                                                                     {item.customization.image && (
                                                                         <div style={{ marginTop: '0.5rem' }}>
-                                                                            <p style={{ marginBottom: '5px' }}>Uploaded Image:</p>
-                                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-                                                                                <a href={item.customization.image} target="_blank" rel="noopener noreferrer">
-                                                                                    <img
-                                                                                        src={item.customization.image}
-                                                                                        alt="Custom Upload"
-                                                                                        style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #ddd' }}
-                                                                                        onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/100?text=No+Image'; }}
-                                                                                    />
-                                                                                </a>
-                                                                                <a
-                                                                                    href={item.customization.image}
-                                                                                    download
-                                                                                    target="_blank"
-                                                                                    rel="noopener noreferrer"
-                                                                                    style={{
-                                                                                        padding: '5px 10px',
-                                                                                        backgroundColor: 'var(--color-primary)',
-                                                                                        color: 'white',
-                                                                                        borderRadius: '4px',
-                                                                                        textDecoration: 'none',
-                                                                                        fontSize: '0.8rem'
-                                                                                    }}
-                                                                                >
-                                                                                    Download Image
-                                                                                </a>
+                                                                            <p style={{ marginBottom: '5px' }}>Uploaded Image(s):</p>
+                                                                            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+                                                                                {item.customization.image.split(',').filter(imgUrl => imgUrl.trim() !== '').map((imgUrl, imgIdx) => (
+                                                                                    <div key={imgIdx} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'center' }}>
+                                                                                        <a href={imgUrl} target="_blank" rel="noopener noreferrer">
+                                                                                            <img
+                                                                                                src={imgUrl}
+                                                                                                alt={`Custom Upload ${imgIdx + 1}`}
+                                                                                                style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #ddd' }}
+                                                                                                onError={(e) => { e.target.onerror = null; e.target.src = 'https://via.placeholder.com/100?text=No+Image'; }}
+                                                                                            />
+                                                                                        </a>
+                                                                                        <button
+                                                                                            onClick={(e) => {
+                                                                                                e.preventDefault();
+                                                                                                handleDownload(imgUrl, `order-${order._id}-custom-${imgIdx + 1}.jpg`);
+                                                                                            }}
+                                                                                            style={{
+                                                                                                padding: '5px 10px',
+                                                                                                backgroundColor: 'var(--color-primary)',
+                                                                                                color: 'white',
+                                                                                                border: 'none',
+                                                                                                borderRadius: '4px',
+                                                                                                cursor: 'pointer',
+                                                                                                fontSize: '0.8rem',
+                                                                                                textAlign: 'center'
+                                                                                            }}
+                                                                                        >
+                                                                                            Download
+                                                                                        </button>
+                                                                                    </div>
+                                                                                ))}
                                                                             </div>
                                                                         </div>
                                                                     )}
@@ -180,3 +205,4 @@ const AdminOrders = () => {
 };
 
 export default AdminOrders;
+

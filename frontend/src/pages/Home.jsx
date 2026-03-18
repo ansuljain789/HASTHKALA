@@ -11,19 +11,21 @@ const Home = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchParams, setSearchParams] = useSearchParams();
-    
-    
-    const [category, setCategory] = useState('featured');
+    const [category, setCategory] = useState(() => {
+        const urlCategory = searchParams.get('category');
+        return urlCategory ? urlCategory : 'featured';
+    });
     
     const [availableCategories, setAvailableCategories] = useState([]);
     const { addToCart } = useCart();
     const { addToWishlist: addProductToWishlist } = useWishlist();
     const { isAdmin } = useAuth();
     const navigate = useNavigate();
+    
     // Sync URL category changes
     useEffect(() => {
-        const urlCategory = searchParams.get('category');
-        if (urlCategory && urlCategory !== category) {
+        const urlCategory = searchParams.get('category') || 'featured';
+        if (urlCategory !== category) {
              setCategory(urlCategory);
         }
     }, [searchParams]);
